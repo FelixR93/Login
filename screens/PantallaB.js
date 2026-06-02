@@ -1,17 +1,14 @@
 import { View, Text, Button, StyleSheet } from 'react-native';
 
-export default function HomeScreen({ navigation }: any) {
+export default function PantallaB({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>
-        Bienvenido ;)
-      </Text>
-
-      <Text style={styles.subtitle}> Pantalla Principal </Text>
+      <Text style={styles.title}> Segunda Pantalla </Text>
+      <Text style={styles.subtitle}> Navegación con Stack ;) </Text>
 
       <View style={styles.buttonContainer}>
-        <Button title="Ir a Pantalla B" onPress={() => navigation.navigate('PantallaB')} />
+        <Button title="Ir a Pantalla C" onPress={() => navigation.navigate('PantallaC')} />
       </View>
     </View>
   );
@@ -21,22 +18,22 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
-    backgroundColor: '#0F172A',
+    backgroundColor: '#111827',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
   },
 
   title: {
-    fontSize: 34,
+    fontSize: 30,
     fontWeight: 'bold',
     color: '#FFFFFF',
     marginBottom: 10,
   },
 
   subtitle: {
-    fontSize: 18,
-    color: '#CBD5E1',
+    fontSize: 17,
+    color: '#D1D5DB',
     marginBottom: 40,
   },
 

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Image, StyleSheet, Text, TextInput, TouchableOpacity, Alert,} from "react-native";
+import { View, Image, StyleSheet, Text, TextInput, TouchableOpacity, Alert} from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
@@ -11,71 +11,108 @@ const Stack = createNativeStackNavigator();
 
 /* ================= LOGIN ================= */
 
-const Login = ({ navigation }: any) => {
+const Login = ({ navigation }) => {
   const [usuario, setUsuario] = useState("");
   const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [focusedField, setFocusedField] = useState(null);
+  const [codigo, setCodigo] = useState("");
+  const [errorField, setErrorField] = useState(null);
 
   const iniciarSesion = () => {
-    if (usuario === "" || password === "") {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (usuario === "" || email === "" || password === "") {
+      setErrorField("usuario");
       Alert.alert("Error", "Complete todos los campos");
-    } else {
-      navigation.navigate("Home");
+      return;
     }
+
+    if (!emailRegex.test(email)) {
+      setErrorField("email");
+      Alert.alert("Error", "Ingrese un correo electrónico válido");
+      return;
+    }
+    setErrorField(null);
+    navigation.navigate("Home");
   };
+
+  const inputStyle = (field) => [
+    styles.input,
+    focusedField === field && styles.inputFocused,
+    errorField === field && styles.inputError,
+  ];
 
   return (
     <View style={styles.container}>
-
       {/* Zona de Branding */}
       <View style={styles.logoContainer}>
-
         <Image
           source={require("./assets/icon/icon.png")}
           style={styles.logo}
           resizeMode="contain"
         />
 
-        <Text style={styles.title}>
-          Iniciar Sesión
-        </Text>
+        <Text style={styles.title}>Iniciar Sesión</Text>
 
-        <Text style={styles.subtitle}>
-          Bienvenido a la aplicación
-        </Text>
-
+        <Text style={styles.subtitle}>Bienvenido a la aplicación</Text>
       </View>
 
       {/* Zona de Formulario */}
       <View style={styles.formContainer}>
-
         <TextInput
-          style={styles.input}
+          style={inputStyle("usuario")}
           placeholder="Usuario"
-          placeholderTextColor="#999"
+          placeholderTextColor="#94A3B8"
           value={usuario}
           onChangeText={setUsuario}
+          keyboardType="default"
+          autoCapitalize="none"
+          autoCorrect={false}
+          onFocus={() => setFocusedField("usuario")}
+          onBlur={() => setFocusedField(null)}
         />
 
         <TextInput
-          style={styles.input}
-          placeholder="Contraseña"
-          placeholderTextColor="#999"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
+          style={inputStyle("email")}
+          placeholder="Correo electrónico"
+          placeholderTextColor="#94A3B8"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          autoCorrect={false}
+          onFocus={() => setFocusedField("email")}
+          onBlur={() => setFocusedField(null)}
         />
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={iniciarSesion}
-        >
-          <Text style={styles.buttonText}>
-            Ingresar
-          </Text>
+        <TextInput
+          style={inputStyle("password")}
+          placeholder="Contraseña"
+          placeholderTextColor="#94A3B8"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          keyboardType="default"
+          autoCapitalize="none"
+          onFocus={() => setFocusedField("password")}
+          onBlur={() => setFocusedField(null)}
+        />
+        <TextInput
+          style={inputStyle("codigo")}
+          placeholder="Código de acceso"
+          placeholderTextColor="#94A3B8"
+          value={codigo}
+          onChangeText={setCodigo}
+          keyboardType="numeric"
+          onFocus={() => setFocusedField("codigo")}
+          onBlur={() => setFocusedField(null)}
+        />
+
+        <TouchableOpacity style={styles.button} onPress={iniciarSesion}>
+          <Text style={styles.buttonText}>Ingresar</Text>
         </TouchableOpacity>
-
       </View>
-
     </View>
   );
 };
@@ -83,10 +120,11 @@ const Login = ({ navigation }: any) => {
 /* ================= APP ================= */
 
 export default function App() {
-
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login" screenOptions={{
+      <Stack.Navigator
+        initialRouteName="Login"
+        screenOptions={{
           headerStyle: {
             backgroundColor: "#0F172A",
           },
@@ -101,10 +139,8 @@ export default function App() {
           contentStyle: {
             backgroundColor: "#0F172A",
           },
-
         }}
       >
-
         <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
         <Stack.Screen name="Home" component={HomeScreen} options={{ title: "Inicio" }} />
         <Stack.Screen name="PantallaB" component={PantallaB} options={{ title: "Pantalla B" }} />
@@ -117,7 +153,6 @@ export default function App() {
 /* ================= ESTILOS ================= */
 
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
     backgroundColor: "#0F172A",
@@ -163,9 +198,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     marginBottom: 18,
     fontSize: 16,
-
     borderWidth: 1,
     borderColor: "#334155",
+  },
+
+  inputFocused: {
+    borderColor: "#0f009bff",
+    borderWidth: 2,
+  },
+
+  inputError: {
+  borderColor: "#E74C3C",
+  borderWidth: 2,
   },
 
   button: {
@@ -192,5 +236,4 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     letterSpacing: 0.5,
   },
-
 });
