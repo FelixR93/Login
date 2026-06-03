@@ -26,7 +26,6 @@ const Login = ({ navigation }) => {
   const inputStyle = (field) => [
     styles.input,
     focusedField === field && styles.inputFocused,
-    errorField === field && styles.inputError,
   ];
 
   return (
@@ -80,30 +79,17 @@ const Login = ({ navigation }) => {
         <TextInput
           style={inputStyle("email")}
           placeholder="Correo electrónico"
-          keyboardType="default"
-          autoCapitalize="none"
-          autoCorrect={false}
-          onFocus={() => setFocusedField("usuario")}
-          onBlur={() => setFocusedField(null)}
-        />
-
-        {touched.usuario && errors.usuario && (
-          <Text style={styles.errorText}>
-            {errors.usuario}
-          </Text>
-        )}
-
-        <TextInput
-          style={inputStyle("email")}
-          placeholder="Correo electrónico"
           placeholderTextColor="#94A3B8"
           value={values.email}
           onChangeText={handleChange("email")}
-          keyboardType="email-address"
+          keyboardType="email-address" 
           autoCapitalize="none"
           autoCorrect={false}
           onFocus={() => setFocusedField("email")}
-          onBlur={handleBlur("email")}
+          onBlur={() => {
+            setFocusedField(null);
+            handleBlur("email");
+          }}
         />
 
         {touched.email && errors.email && (
@@ -120,6 +106,11 @@ const Login = ({ navigation }) => {
           onChangeText={handleChange("password")}
           secureTextEntry
           keyboardType="default"
+          onFocus={() => setFocusedField("password")}
+          onBlur={() => {
+            setFocusedField(null);
+            handleBlur("password");
+          }}
         />
 
         {touched.password && errors.password && (
