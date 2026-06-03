@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { View, Image, StyleSheet, Text, TextInput, TouchableOpacity, Alert} from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { Formik } from "formik";
+import * as Yup from "yup";
 
 import HomeScreen from "./screens/HomeScreen";
 import PantallaB from "./screens/PantallaB";
@@ -9,33 +11,17 @@ import PantallaC from "./screens/PantallaC";
 
 const Stack = createNativeStackNavigator();
 
+const LoginSchema = Yup.object().shape({
+  usuario: Yup.string().required("El usuario es obligatorio"),
+  email: Yup.string().email("Correo electrónico inválido") .required("El correo es obligatorio"),
+  password: Yup.string().min(4, "Mínimo 4 caracteres") .required("La contraseña es obligatoria"),
+  codigo: Yup.number().typeError("Solo números").required("El código es obligatorio"),
+});
+
 /* ================= LOGIN ================= */
 
 const Login = ({ navigation }) => {
-  const [usuario, setUsuario] = useState("");
-  const [password, setPassword] = useState("");
-  const [email, setEmail] = useState("");
   const [focusedField, setFocusedField] = useState(null);
-  const [codigo, setCodigo] = useState("");
-  const [errorField, setErrorField] = useState(null);
-
-  const iniciarSesion = () => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (usuario === "" || email === "" || password === "") {
-      setErrorField("usuario");
-      Alert.alert("Error", "Complete todos los campos");
-      return;
-    }
-
-    if (!emailRegex.test(email)) {
-      setErrorField("email");
-      Alert.alert("Error", "Ingrese un correo electrónico válido");
-      return;
-    }
-    setErrorField(null);
-    navigation.navigate("Home");
-  };
 
   const inputStyle = (field) => [
     styles.input,
@@ -59,13 +45,41 @@ const Login = ({ navigation }) => {
       </View>
 
       {/* Zona de Formulario */}
-      <View style={styles.formContainer}>
+      <Formik
+        initialValues={{
+          usuario: "",
+          email: "",
+          password: "",
+          codigo: "",
+        }}
+        validationSchema={LoginSchema}
+        onSubmit={() => navigation.navigate("Home")}
+        > 
+        {({
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          values,
+          errors,
+          touched,
+        }) => (
+          <View style={styles.formContainer}>
+
         <TextInput
           style={inputStyle("usuario")}
           placeholder="Usuario"
           placeholderTextColor="#94A3B8"
-          value={usuario}
-          onChangeText={setUsuario}
+          value={values.usuario}
+          onChangeText={handleChange("usuario")}
+          onBlur={handleBlur("usuario")}
+        />
+        {errors.usuario && touched.usuario && (
+          <Text style={styles.errorText}>{errors.usuario}</Text>
+        )}
+
+        <TextInput
+          style={inputStyle("email")}
+          placeholder="Correo electrónico"
           keyboardType="default"
           autoCapitalize="none"
           autoCorrect={false}
@@ -73,47 +87,74 @@ const Login = ({ navigation }) => {
           onBlur={() => setFocusedField(null)}
         />
 
+        {touched.usuario && errors.usuario && (
+          <Text style={styles.errorText}>
+            {errors.usuario}
+          </Text>
+        )}
+
         <TextInput
           style={inputStyle("email")}
           placeholder="Correo electrónico"
           placeholderTextColor="#94A3B8"
-          value={email}
-          onChangeText={setEmail}
+          value={values.email}
+          onChangeText={handleChange("email")}
           keyboardType="email-address"
           autoCapitalize="none"
           autoCorrect={false}
           onFocus={() => setFocusedField("email")}
-          onBlur={() => setFocusedField(null)}
+          onBlur={handleBlur("email")}
         />
+
+        {touched.email && errors.email && (
+          <Text style={styles.errorText}>
+            {errors.email}
+          </Text>
+        )}
 
         <TextInput
           style={inputStyle("password")}
           placeholder="Contraseña"
           placeholderTextColor="#94A3B8"
-          value={password}
-          onChangeText={setPassword}
+          value={values.password}
+          onChangeText={handleChange("password")}
           secureTextEntry
           keyboardType="default"
-          autoCapitalize="none"
-          onFocus={() => setFocusedField("password")}
-          onBlur={() => setFocusedField(null)}
         />
+
+        {touched.password && errors.password && (
+          <Text style={styles.errorText}>
+            {errors.password}
+          </Text>
+        )}
+
         <TextInput
           style={inputStyle("codigo")}
           placeholder="Código de acceso"
           placeholderTextColor="#94A3B8"
-          value={codigo}
-          onChangeText={setCodigo}
-          keyboardType="numeric"
+          value={values.codigo}
+          onChangeText={handleChange("codigo")}
+          keyboardType="default"
+          autoCapitalize="none"
           onFocus={() => setFocusedField("codigo")}
-          onBlur={() => setFocusedField(null)}
+          onBlur={handleBlur("codigo")}
         />
 
-        <TouchableOpacity style={styles.button} onPress={iniciarSesion}>
+        {touched.codigo && errors.codigo && (
+          <Text style={styles.errorText}>
+            {errors.codigo}
+          </Text>
+        )}
+
+        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
           <Text style={styles.buttonText}>Ingresar</Text>
         </TouchableOpacity>
       </View>
+        )}
+      </Formik>
     </View>
+    
+    
   );
 };
 
@@ -210,6 +251,13 @@ const styles = StyleSheet.create({
   inputError: {
   borderColor: "#E74C3C",
   borderWidth: 2,
+  },
+
+  errorText: {
+  color: "#E74C3C",
+  fontSize: 12,
+  marginTop: -10,
+  marginBottom: 10,
   },
 
   button: {
