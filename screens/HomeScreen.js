@@ -1,6 +1,19 @@
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, Button, StyleSheet, Alert } from 'react-native';
+import { signOut } from "firebase/auth";
+import { auth } from "../firebaseConfig";
 
 export default function HomeScreen({ navigation }) {
+
+  const cerrarSesion = async () => {
+    try {
+      await signOut(auth);
+      Alert.alert("Sesión cerrada", "Has cerrado sesión exitosamente.");
+      navigation.replace("Login");
+    } catch (error) {
+      Alert.alert("Error", "No se pudo cerrar sesión. Inténtalo de nuevo.");
+      console.log(error);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -13,6 +26,11 @@ export default function HomeScreen({ navigation }) {
       <View style={styles.buttonContainer}>
         <Button title="Ir a Pantalla B" onPress={() => navigation.navigate('PantallaB')} />
       </View>
+
+      <View style={styles.buttonContainer}>
+        <Button title="Cerrar Sesión" color="#c76464ff" onPress={cerrarSesion} />
+      </View>
+
     </View>
   );
 }
@@ -44,6 +62,7 @@ const styles = StyleSheet.create({
     width: '80%',
     borderRadius: 10,
     overflow: 'hidden',
+    marginBottom: 15,
   },
 
 });

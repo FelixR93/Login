@@ -4,10 +4,15 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "./firebaseConfig";
+
+console.log("Firebase iniciado");
 
 import HomeScreen from "./screens/HomeScreen";
 import PantallaB from "./screens/PantallaB";
 import PantallaC from "./screens/PantallaC";
+import RegisterScreen from "./screens/RegisterScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -52,7 +57,22 @@ const Login = ({ navigation }) => {
           codigo: "",
         }}
         validationSchema={LoginSchema}
-        onSubmit={() => navigation.navigate("Home")}
+        onSubmit={async (values) => {
+          try {
+            await signInWithEmailAndPassword(
+              auth,
+              values.email,
+              values.password
+            );
+
+            Alert.alert("Bienvenido", "Inicio de sesión correcto");
+            navigation.navigate("Home");
+
+          } catch (error) {
+            Alert.alert("Error", "Correo o contraseña incorrectos");
+            console.log(error);
+          }
+        }}
         > 
         {({
           handleChange,
@@ -140,11 +160,14 @@ const Login = ({ navigation }) => {
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
           <Text style={styles.buttonText}>Ingresar</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity style={styles.registerButton} onPress={() =>navigation.navigate("Register")}>            
+          <Text style={styles.registerText}>Regístraese</Text>
+        </TouchableOpacity>
       </View>
         )}
       </Formik>
-    </View>
-    
+    </View>    
     
   );
 };
@@ -177,6 +200,7 @@ export default function App() {
         <Stack.Screen name="Home" component={HomeScreen} options={{ title: "Inicio" }} />
         <Stack.Screen name="PantallaB" component={PantallaB} options={{ title: "Pantalla B" }} />
         <Stack.Screen name="PantallaC" component={PantallaC} options={{ title: "Pantalla C" }} />
+        <Stack.Screen name="Register" component={RegisterScreen} options={{ title: "Registro" }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -192,43 +216,41 @@ const styles = StyleSheet.create({
   },
 
   logoContainer: {
-    flex: 1,
-    justifyContent: "center",
     alignItems: "center",
+    marginTop: 40,
+    marginBottom: 30,
   },
 
   logo: {
-    width: 160,
-    height: 160,
-    marginBottom: 20,
+    width: 120,
+    height: 120,
+    marginBottom: 15,
   },
 
   title: {
-    fontSize: 32,
+    fontSize: 26,
     fontWeight: "bold",
     color: "#FFFFFF",
-    letterSpacing: 1,
   },
 
   subtitle: {
     fontSize: 15,
     color: "#94A3B8",
-    marginTop: 8,
-    textAlign: "center",
+    marginTop: 5,
   },
 
   formContainer: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "flex-start",
   },
 
   input: {
     backgroundColor: "#1E293B",
     color: "#FFFFFF",
     borderRadius: 14,
-    paddingVertical: 16,
+    paddingVertical: 14,
     paddingHorizontal: 18,
-    marginBottom: 18,
+    marginBottom: 14,
     fontSize: 16,
     borderWidth: 1,
     borderColor: "#334155",
@@ -256,16 +278,6 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 14,
     alignItems: "center",
-
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-
-    shadowOpacity: 0.3,
-    shadowRadius: 4.65,
-
     elevation: 8,
   },
 
@@ -275,4 +287,20 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     letterSpacing: 0.5,
   },
+
+  registerButton: {
+  backgroundColor: "#2563EB",
+  marginTop: 15,
+  alignItems: "center",  
+  paddingVertical: 16,
+  borderRadius: 14,
+  alignItems: "center",
+  elevation: 8,
+},
+
+registerText: {
+  color: "#fdfeffff",
+  fontSize: 16,
+  fontWeight: "bold",
+},
 });
